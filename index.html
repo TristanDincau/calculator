@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+  margin: 0;
+}
+input.enter {
+  width: 100%;
+  height: 36vh;
+  background: linear-gradient( -45deg,
+  #aaa 5%, #fff 10%, #ccc 30%, #ddd 50%, #ccc 70%, #fff 80%, #999 95%);
+  margin: auto;
+  border: 5px solid black;
+  box-sizing: border-box;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  text-align: right;
+  font-size: 7rem;
+  color: green;
+}
+div.container {
+  width: 80%;
+  height: 80vh;
+  background-color: lightgray;
+  margin: auto;
+  border-radius: 10%;
+}
+div.flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 2%;
+}
+div.parent {
+  border: 5px solid black;
+  height: 80%;
+  box-sizing: border-box;
+}
+div.p1 {
+  width: 75%;
+  float: left;
+  color: white;
+  background-image: linear-gradient(white, blue);
+}
+div.p2 {
+  width 25%;
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(white, blue);
+}
+
+button.number-buttons {
+  height: 20%;
+  width: 30%;
+/*   flex: 0 0 30%; */
+  background-image: linear-gradient(gold, silver);
+  border-radius: 25%;
+  font-size: 3rem;
+}
+button.number-two-buttons {
+  height: 18%;
+  width: 80%;
+/*   flex: 0 0 30%; */
+  background-image: linear-gradient(gold, silver);
+  border-radius: 25%;
+  font-size: 4rem;
+}
+#equal {
+    height: 20%;
+  flex: 2 0 60%;
+  order: 10;
+
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+  <input class="enter" type="text" id="display" maxLength="10" disabled></input>
+  <div class="parent p1 flex" id="buttons1">
+    <button class="operator input-button number-buttons" id="equal" type="button">=</button>
+  </div>
+  <div class="parent p2 flex" id="buttons2">
+    <button class="operator input-button number-two-buttons" id="clear" type="button">C</button>
+    <button class="operator input-button number-two-buttons" data-value="+" id="add" type="button">+</button>
+    <button class="operator input-button number-two-buttons" data-value="-" id="subtract" type="button">-</button>
+    <button class="operator input-button number-two-buttons" data-value="*" id="multiply" type="button">*</button>
+    <button class="operator input-button number-two-buttons" data-value="/" id="divide" type="button">/</button>
+  </div>
+</div>
+    <script>
+        const calculator = document.getElementById("container");
+const resultDisplay = document.getElementById("display");
+const buttons1 = document.getElementById("buttons1");
+const clearButton = document.getElementById("clear");
+const equalButton = document.getElementById("equal");
+const addButton = document.getElementById("add");
+const minusButton = document.getElementById("subtract");
+const divideButton = document.getElementById("divide");
+const multiplyButton = document.getElementById("multiply");
+let maxLength = resultDisplay.getAttribute("maxLength");
+
+let tempNumber = null;
+let firstNumber = null;
+let secondNumber = null;
+let operation = null;
+let result = null;
+
+for (let i = 0; i < 10; i++) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.classList.add("number-buttons");
+  button.classList.add("input-button");
+  button.textContent = i;
+  button.setAttribute("data-value", i);
+  if (i === 0) {
+    button.style.order = 1;
+  }
+  buttons1.appendChild(button);
+}
+
+const numberButtons = document.querySelectorAll(".number-buttons");
+
+numberButtons.forEach((button, index) => {
+  //take the string of the data-value attached to the button and save it as a Int (using parseInt()) to the variable dataValue
+  let dataValue = parseInt(button.getAttribute("data-value"));
+
+  button.addEventListener("click", function (event) {
+    if (resultDisplay.value.length < maxLength) {
+      if (operation === null) {
+        if (firstNumber === null || firstNumber === 0) {
+          firstNumber = dataValue;
+        } else {
+          firstNumber = parseInt(firstNumber.toString().concat(dataValue));
+        }
+        resultDisplay.value = firstNumber.toString();
+      } else {
+        if (secondNumber === null || secondNumber === 0) {
+          secondNumber = dataValue;
+        } else {
+          secondNumber = parseInt(secondNumber.toString().concat(dataValue));
+        }
+        resultDisplay.value = secondNumber.toString();
+      }
+    }
+  });
+});
+
+function clearValues() {
+  firstNumber = null;
+  tempNumber = null;
+  secondNumber = null;
+  operation = null;
+  result = null;
+  resultDisplay.value = 0;
+}
+clearButton.addEventListener("click", function () {
+  clearValues();
+});
+
+const operatorButtons = document.querySelectorAll(".operator");
+
+operatorButtons.forEach((button) => {
+  // console.log(button);
+  button.addEventListener("click", function (event) {
+    const thisOperation = event.target.id;
+    if (firstNumber !== null && secondNumber === null) {
+      switch (thisOperation) {
+        case "add":
+          operation = "+";
+          break;
+        case "subtract":
+          operation = "-";
+          break;
+        case "multiply":
+          operation = "*";
+          break;
+        case "divide":
+          operation = "/";
+          break;
+      }
+      resultDisplay.value = operation;
+    }
+  });
+});
+
+equalButton.addEventListener("click", function (event) {
+  if (secondNumber !== null) {
+    switch (operation) {
+      case "+":
+        result = firstNumber + secondNumber;
+        break;
+      case "-":
+        result = firstNumber - secondNumber;
+        break;
+      case "*":
+        result = firstNumber * secondNumber;
+        break;
+      case "/":
+        result = firstNumber / secondNumber;
+        break;
+    }
+    resultDisplay.value = result;
+  }
+  if (result > 0) {
+    firstNumber = result;
+    secondNumber = null;
+    operation = null;
+  }
+});
+let theResult = result.toFixed(2);
+
+    </script>
+</body>
+</html>
